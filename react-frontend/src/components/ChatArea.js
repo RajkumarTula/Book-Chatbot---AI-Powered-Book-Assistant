@@ -5,6 +5,7 @@ import { FaPaperPlane, FaUser, FaRobot } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import Message from './Message';
 import InputSuggestions from './InputSuggestions';
+import { useTheme } from '../hooks/useTheme';
 
 const ChatContainer = styled.div`
   display: flex;
@@ -15,15 +16,16 @@ const ChatContainer = styled.div`
 
 const ChatHeader = styled.div`
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e9ecef;
-  background: linear-gradient(135deg, #f6f9ff 0%, #fff 100%);
+  border-bottom: 1px solid ${props => props.theme.border};
+  background: linear-gradient(135deg, ${props => props.theme.surface} 0%, ${props => props.theme.surfaceSecondary} 100%);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: all 0.3s ease;
 `;
 
 const ChatTitle = styled.h2`
-  color: #333;
+  color: ${props => props.theme.text};
   font-weight: 600;
   margin: 0;
 `;
@@ -33,7 +35,7 @@ const StatusIndicator = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
-  color: #666;
+  color: ${props => props.theme.textSecondary};
 `;
 
 const StatusDot = styled.div`
@@ -42,7 +44,7 @@ const StatusDot = styled.div`
   border-radius: 50%;
   background: #28a745;
   animation: pulse 2s infinite;
-  
+
   @keyframes pulse {
     0% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -54,16 +56,18 @@ const MessagesContainer = styled.div`
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
-  background: linear-gradient(180deg, #f8f9ff 0%, #f8f9fa 100%);
+  background: linear-gradient(180deg, ${props => props.theme.background} 0%, ${props => props.theme.surface} 100%);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  transition: background 0.3s ease;
 `;
 
 const InputArea = styled.div`
   padding: 1.5rem 2rem;
-  background: linear-gradient(180deg, #ffffff 0%, #f9f9ff 100%);
-  border-top: 1px solid #e9ecef;
+  background: linear-gradient(180deg, ${props => props.theme.surface} 0%, ${props => props.theme.surfaceSecondary} 100%);
+  border-top: 1px solid ${props => props.theme.border};
+  transition: all 0.3s ease;
 `;
 
 const InputContainer = styled.div`
@@ -75,7 +79,7 @@ const InputContainer = styled.div`
 const InputField = styled.textarea`
   flex: 1;
   padding: 1rem 1.5rem;
-  border: 2px solid #e9ecef;
+  border: 2px solid ${props => props.theme.inputBorder};
   border-radius: 25px;
   font-size: 1rem;
   outline: none;
@@ -84,14 +88,16 @@ const InputField = styled.textarea`
   min-height: 50px;
   max-height: 120px;
   font-family: inherit;
-  
+  background: ${props => props.theme.inputBg};
+  color: ${props => props.theme.text};
+
   &:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: ${props => props.theme.inputFocus};
+    box-shadow: 0 0 0 3px ${props => `${props.theme.inputFocus}1A`};
   }
-  
+
   &::placeholder {
-    color: #999;
+    color: ${props => props.theme.textSecondary};
   }
 `;
 
@@ -99,8 +105,8 @@ const SendButton = styled(motion.button)`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, ${props => props.theme.buttonPrimary} 0%, ${props => props.theme.accentSecondary} 100%);
+  color: ${props => props.theme.userText};
   border: none;
   cursor: pointer;
   display: flex;
@@ -108,12 +114,12 @@ const SendButton = styled(motion.button)`
   justify-content: center;
   transition: all 0.3s ease;
   flex-shrink: 0;
-  
+
   &:hover:not(:disabled) {
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px ${props => `${props.theme.buttonPrimary}4D`};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -133,6 +139,7 @@ const suggestions = [
 ];
 
 function ChatArea({ messages, onSendMessage, isLoading, onBookClick }) {
+  const { theme } = useTheme();
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const messagesEndRef = useRef(null);
@@ -185,15 +192,15 @@ function ChatArea({ messages, onSendMessage, isLoading, onBookClick }) {
 
   return (
     <ChatContainer>
-      <ChatHeader>
-        <ChatTitle>Chat with BookBot</ChatTitle>
-        <StatusIndicator>
+      <ChatHeader theme={theme}>
+        <ChatTitle theme={theme}>Chat with BookBot</ChatTitle>
+        <StatusIndicator theme={theme}>
           <StatusDot />
           <span>Online</span>
         </StatusIndicator>
       </ChatHeader>
 
-      <MessagesContainer>
+      <MessagesContainer theme={theme}>
         <AnimatePresence>
           {messages.map((message, index) => (
             <Message
@@ -206,9 +213,10 @@ function ChatArea({ messages, onSendMessage, isLoading, onBookClick }) {
         <div ref={messagesEndRef} />
       </MessagesContainer>
 
-      <InputArea>
+      <InputArea theme={theme}>
         <InputContainer>
           <InputField
+            theme={theme}
             ref={inputRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -219,6 +227,7 @@ function ChatArea({ messages, onSendMessage, isLoading, onBookClick }) {
             disabled={isLoading}
           />
           <SendButton
+            theme={theme}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSend}

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaUser, FaRobot } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
+import { useTheme } from '../hooks/useTheme';
 
 const MessageContainer = styled(motion.div)`
   display: flex;
@@ -23,33 +24,37 @@ const Avatar = styled.div`
   justify-content: center;
   font-size: 1.2rem;
   flex-shrink: 0;
-  background: ${props => props.isUser 
-    ? '#ffd700' 
-    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+  background: ${props => props.isUser
+    ? props.theme.userMessage
+    : `linear-gradient(135deg, ${props.theme.surface} 0%, ${props.theme.surfaceSecondary} 100%)`
   };
-  color: ${props => props.isUser ? '#333' : 'white'};
+  color: ${props => props.isUser ? props.theme.userText : props.theme.accent};
+  border: 2px solid ${props => props.isUser ? props.theme.userMessage : props.theme.border};
 `;
 
 const MessageContent = styled.div`
   flex: 1;
   max-width: 70%;
-  
+
   .user-message & {
     text-align: right;
   }
 `;
 
 const MessageText = styled.div`
-  background: white;
+  background: ${props => props.theme.botMessage};
   padding: 1rem 1.5rem;
   border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   line-height: 1.5;
   word-wrap: break-word;
-  
+  border: 1px solid ${props => props.theme.border};
+  color: ${props => props.theme.botText};
+
   .user-message & {
-    background: #667eea;
-    color: white;
+    background: ${props => props.theme.userMessage};
+    color: ${props => props.theme.userText};
+    border-color: ${props => props.theme.userMessage};
   }
   
   /* Markdown styling */
@@ -126,39 +131,39 @@ const MessageText = styled.div`
 
 const MessageTime = styled.div`
   font-size: 0.8rem;
-  color: #666;
+  color: ${props => props.theme.textSecondary};
   margin-top: 0.5rem;
-  
+
   .user-message & {
     text-align: right;
   }
 `;
 
 const BookLink = styled.span`
-  color: #667eea;
+  color: ${props => props.theme.link};
   text-decoration: none;
   font-weight: 500;
   cursor: pointer;
-  border-bottom: 1px dotted #667eea;
-  
+  border-bottom: 1px dotted ${props => props.theme.link};
+
   &:hover {
     text-decoration: underline;
-    border-bottom: 1px solid #667eea;
+    border-bottom: 1px solid ${props => props.theme.link};
   }
-  
+
   .user-message & {
-    color: #ffd700;
-    border-bottom-color: #ffd700;
-    
+    color: ${props => props.theme.userText};
+    border-bottom-color: ${props => props.theme.userText};
+
     &:hover {
-      border-bottom-color: #ffd700;
+      border-bottom-color: ${props => props.theme.userText};
     }
   }
 `;
 
 const PriceHighlight = styled.span`
-  background: #28a745;
-  color: white;
+  background: ${props => props.theme.price};
+  color: ${props => props.theme.userText};
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-weight: 600;
@@ -173,11 +178,11 @@ const StarRating = styled.div`
 `;
 
 const Star = styled.span`
-  color: #ffd700;
+  color: ${props => props.theme.star};
   font-size: 0.9rem;
-  
+
   &.empty {
-    color: #ddd;
+    color: ${props => props.theme.starEmpty};
   }
 `;
 
@@ -185,7 +190,7 @@ const TypingIndicator = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #666;
+  color: ${props => props.theme.textSecondary};
   font-style: italic;
 `;
 
@@ -198,17 +203,17 @@ const TypingDot = styled.span`
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #666;
+  background: ${props => props.theme.accent};
   animation: typing 1.4s infinite;
-  
+
   &:nth-child(2) {
     animation-delay: 0.2s;
   }
-  
+
   &:nth-child(3) {
     animation-delay: 0.4s;
   }
-  
+
   @keyframes typing {
     0%, 60%, 100% {
       transform: translateY(0);
@@ -222,25 +227,26 @@ const TypingDot = styled.span`
 `;
 
 function Message({ message, onBookClick }) {
+  const { theme } = useTheme();
   const isUser = message.sender === 'user';
   const isTyping = message.isTyping;
 
   const formatMessage = (text) => {
     if (!text) return '';
-    
+
     // Convert book titles to clickable links
     let formatted = text.replace(/\*\*([^*]+)\*\*/g, (match, title) => {
       return `<span class="book-link" onclick="window.handleBookClick('${title}')">${title}</span>`;
     });
-    
+
     // Convert price patterns
     formatted = formatted.replace(/\$(\d+(?:\.\d+)?)/g, '<span class="price-highlight">$$$1</span>');
-    
+
     // Convert rating patterns
     formatted = formatted.replace(/(\d+(?:\.\d+)?)\/5/g, (match, rating) => {
       return createStarRating(parseFloat(rating));
     });
-    
+
     return formatted;
   };
 
@@ -284,17 +290,17 @@ function Message({ message, onBookClick }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Avatar isUser={isUser}>
+        <Avatar isUser={isUser} theme={theme}>
           {isUser ? <FaUser /> : <FaRobot />}
         </Avatar>
         <MessageContent>
-          <MessageText>
-            <TypingIndicator>
+          <MessageText theme={theme}>
+            <TypingIndicator theme={theme}>
               <span>Typing</span>
               <TypingDots>
-                <TypingDot />
-                <TypingDot />
-                <TypingDot />
+                <TypingDot theme={theme} />
+                <TypingDot theme={theme} />
+                <TypingDot theme={theme} />
               </TypingDots>
             </TypingIndicator>
           </MessageText>
@@ -310,23 +316,23 @@ function Message({ message, onBookClick }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Avatar isUser={isUser}>
+      <Avatar isUser={isUser} theme={theme}>
         {isUser ? <FaUser /> : <FaRobot />}
       </Avatar>
       <MessageContent>
-        <MessageText>
+        <MessageText theme={theme}>
           <ReactMarkdown
             components={{
               span: ({ children, ...props }) => {
                 if (props.className === 'book-link') {
                   return (
-                    <BookLink onClick={() => onBookClick(children)}>
+                    <BookLink theme={theme} onClick={() => onBookClick(children)}>
                       {children}
                     </BookLink>
                   );
                 }
                 if (props.className === 'price-highlight') {
-                  return <PriceHighlight>{children}</PriceHighlight>;
+                  return <PriceHighlight theme={theme}>{children}</PriceHighlight>;
                 }
                 if (props.className === 'star-rating') {
                   return <StarRating dangerouslySetInnerHTML={{ __html: children }} />;
@@ -338,7 +344,7 @@ function Message({ message, onBookClick }) {
             {message.text}
           </ReactMarkdown>
         </MessageText>
-        <MessageTime>
+        <MessageTime theme={theme}>
           {message.timestamp || getCurrentTime()}
         </MessageTime>
       </MessageContent>

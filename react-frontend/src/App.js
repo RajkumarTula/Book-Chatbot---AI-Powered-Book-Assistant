@@ -10,6 +10,7 @@ import LoadingOverlay from './components/LoadingOverlay';
 import { useChat } from './hooks/useChat';
 import { useBooks } from './hooks/useBooks';
 import { useAPI } from './hooks/useAPI';
+import { ThemeProvider, useTheme } from './hooks/useTheme';
 
 const AppContainer = styled.div`
   display: flex;
@@ -17,8 +18,9 @@ const AppContainer = styled.div`
   min-height: 100vh;
   max-width: 1400px;
   margin: 0 auto;
-  background: white;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+  background: ${props => props.theme.background};
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s ease;
 `;
 
 const MainContent = styled.div`
@@ -33,8 +35,8 @@ const MainContent = styled.div`
 
 const SidebarContainer = styled.div`
   width: 300px;
-  background: #f8f9fa;
-  border-right: 1px solid #e9ecef;
+  background: ${props => props.theme.surface};
+  border-right: 1px solid ${props => props.theme.border};
   overflow-y: auto;
 
   @media (max-width: 768px) {
@@ -51,37 +53,38 @@ const ChatContainer = styled.div`
   min-height: 0;
 `;
 
-function App() {
+function AppContent() {
+  const { theme } = useTheme();
   const [selectedBook, setSelectedBook] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [source, setSource] = useState('both');
-  
+
   const { isOnline, checkAPIStatus } = useAPI();
-  const { 
-    messages, 
-    sendMessage, 
-    clearChat, 
-    newSession, 
-    isLoading: chatLoading 
+  const {
+    messages,
+    sendMessage,
+    clearChat,
+    newSession,
+    isLoading: chatLoading
   } = useChat();
-  
-  const { 
-    featuredBooks, 
-    loadFeaturedBooks, 
-    getBookDetails 
+
+  const {
+    featuredBooks,
+    loadFeaturedBooks,
+    getBookDetails
   } = useBooks();
 
   useEffect(() => {
     // Check API status on mount
     checkAPIStatus();
-    
+
     // Load featured books
     loadFeaturedBooks();
-    
+
     // Check API status periodically
     const interval = setInterval(checkAPIStatus, 30000);
-    
+
     return () => clearInterval(interval);
   }, [checkAPIStatus, loadFeaturedBooks]);
 
@@ -111,7 +114,7 @@ function App() {
 
   const handleQuickAction = (action) => {
     let message = '';
-    
+
     switch (action) {
       case 'search':
         message = 'Search for books';
@@ -134,31 +137,31 @@ function App() {
       default:
         return;
     }
-    
+
     if (message) {
       handleSendMessage(message);
     }
   };
 
   return (
-    <AppContainer>
-      <Header 
+    <AppContainer theme={theme}>
+      <Header
         isOnline={isOnline}
         onClearChat={clearChat}
         onNewSession={newSession}
         source={source}
         onChangeSource={setSource}
       />
-      
+
       <MainContent>
-        <SidebarContainer>
+        <SidebarContainer theme={theme}>
           <Sidebar
             onQuickAction={handleQuickAction}
             featuredBooks={featuredBooks}
             onBookClick={handleBookClick}
           />
         </SidebarContainer>
-        
+
         <ChatContainer>
           <ChatArea
             messages={messages}
@@ -189,12 +192,21 @@ function App() {
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#363636',
-            color: '#fff',
+            background: theme.surface,
+            color: theme.accent,
+            border: `1px solid ${theme.border}`,
           },
         }}
       />
     </AppContainer>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

@@ -1,13 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FaBookOpen, FaTrash, FaPlus, FaCircle } from 'react-icons/fa';
+import { FaBookOpen, FaTrash, FaPlus, FaCircle, FaSun, FaMoon } from 'react-icons/fa';
+import { useTheme } from '../hooks/useTheme';
 
 const HeaderContainer = styled.header`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, ${props => props.theme.surface} 0%, ${props => props.theme.surfaceSecondary} 100%);
+  color: ${props => props.theme.text};
   padding: 1rem 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid ${props => props.theme.border};
+  transition: all 0.3s ease;
 `;
 
 const HeaderContent = styled.div`
@@ -24,13 +27,14 @@ const Logo = styled.div`
 
 const LogoIcon = styled(FaBookOpen)`
   font-size: 2rem;
-  color: #ffd700;
+  color: ${props => props.theme.accent};
 `;
 
 const LogoText = styled.h1`
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0;
+  color: ${props => props.theme.text};
 `;
 
 const HeaderActions = styled.div`
@@ -45,13 +49,14 @@ const StatusIndicator = styled.div`
   gap: 0.5rem;
   font-size: 0.9rem;
   margin-right: 1rem;
+  color: ${props => props.theme.textSecondary};
 `;
 
 const StatusDot = styled(FaCircle)`
   color: ${props => props.isOnline ? '#28a745' : '#dc3545'};
   font-size: 0.8rem;
   animation: ${props => props.isOnline ? 'pulse 2s infinite' : 'none'};
-  
+
   @keyframes pulse {
     0% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -74,29 +79,40 @@ const Button = styled(motion.button)`
 `;
 
 const PrimaryButton = styled(Button)`
-  background: #ffd700;
-  color: #333;
-  
+  background: ${props => props.theme.buttonPrimary};
+  color: ${props => props.theme.userText};
+
   &:hover {
-    background: #ffed4e;
+    background: ${props => props.theme.accentSecondary};
     transform: translateY(-2px);
   }
 `;
 
 const SecondaryButton = styled(Button)`
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  
+  background: ${props => props.theme.buttonSecondary};
+  color: ${props => props.theme.text};
+  border: 1px solid ${props => props.theme.border};
+
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: ${props => props.theme.surface};
+  }
+`;
+
+const ThemeToggleButton = styled(Button)`
+  background: ${props => props.theme.surface};
+  color: ${props => props.theme.text};
+  border: 1px solid ${props => props.theme.border};
+  padding: 0.5rem;
+
+  &:hover {
+    background: ${props => props.theme.surfaceSecondary};
   }
 `;
 
 const SourceSelect = styled.select`
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: ${props => props.theme.inputBg};
+  color: ${props => props.theme.text};
+  border: 1px solid ${props => props.theme.inputBorder};
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
   font-weight: 500;
@@ -105,32 +121,46 @@ const SourceSelect = styled.select`
   backdrop-filter: blur(4px);
 
   option {
-    color: #333;
+    color: ${props => props.theme.userText};
+    background: ${props => props.theme.surface};
   }
 `;
 
 function Header({ isOnline, onClearChat, onNewSession, source, onChangeSource }) {
+  const { theme, isDark, toggleTheme } = useTheme();
+
   return (
-    <HeaderContainer>
+    <HeaderContainer theme={theme}>
       <HeaderContent>
         <Logo>
-          <LogoIcon />
-          <LogoText>BookBot</LogoText>
+          <LogoIcon theme={theme} />
+          <LogoText theme={theme}>BookBot</LogoText>
         </Logo>
-        
+
         <HeaderActions>
-          <StatusIndicator>
+          <StatusIndicator theme={theme}>
             <StatusDot isOnline={isOnline} />
             <span>{isOnline ? 'Online' : 'Offline'}</span>
           </StatusIndicator>
 
-          <SourceSelect value={source} onChange={(e) => onChangeSource?.(e.target.value)}>
+          <SourceSelect theme={theme} value={source} onChange={(e) => onChangeSource?.(e.target.value)}>
             <option value="dataset">Dataset</option>
             <option value="google">Internet</option>
             <option value="both">Both</option>
           </SourceSelect>
-          
+
+          <ThemeToggleButton
+            theme={theme}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleTheme}
+            title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+          >
+            {isDark ? <FaSun /> : <FaMoon />}
+          </ThemeToggleButton>
+
           <SecondaryButton
+            theme={theme}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onClearChat}
@@ -138,8 +168,9 @@ function Header({ isOnline, onClearChat, onNewSession, source, onChangeSource })
             <FaTrash />
             Clear Chat
           </SecondaryButton>
-          
+
           <PrimaryButton
+            theme={theme}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onNewSession}
