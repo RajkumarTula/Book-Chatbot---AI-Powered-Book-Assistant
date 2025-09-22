@@ -1,0 +1,63 @@
+{
+  "search_queries": [
+    "Find books by Stephen King",
+    "Search for Harry Potter books",
+    "Look for science fiction novels",
+    "Find mystery books",
+    "Search for romance novels",
+    "Look for fantasy books",
+    "Find books about cooking",
+    "Search for history books",
+    "Look for self-help books",
+    "Find books about programming",
+    "Search for children's books",
+    "Look for young adult novels",
+    "Find books about travel",
+    "Search for business books",
+    "Look for psychology books",
+    "Find books about art",
+    "Search for poetry books",
+    "Look for biographies",
+    "Find books about photography",
+    "Search for gardening books"
+  ],
+  "price_queries": [
+    "How much does Harry Potter cost?",
+    "What's the price of The Great Gatsby?",
+    "Show me the cost of 1984",
+    "How much is To Kill a Mockingbird?",
+    "What does The Hobbit cost?",
+    "Price of Dune book",
+    "How much for Pride and Prejudice?",
+    "Cost of The Catcher in the Rye",
+    "What's the price of The Lord of the Rings?",
+    "How much does The Hunger Games cost?"
+  ],
+  "rating_queries": [
+    "What's the rating of Harry Potter?",
+    "How is The Great Gatsby rated?",
+    "Show me the rating for 1984",
+    "What do people think of To Kill a Mockingbird?",
+    "Rating for The Hobbit",
+    "How good is Dune?",
+    "What's the rating of Pride and Prejudice?",
+    "How is The Catcher in the Rye rated?",
+    "Rating for The Lord of the Rings?",
+    "What do people think of The Hunger Games?"
+  ],
+  "recommendation_queries": [
+    "Recommend me some books",
+    "What should I read next?",
+    "Suggest some good books",
+    "I need book recommendations",
+    "What books do you recommend?",
+    "Suggest books like Harry Potter",
+    "Recommend books similar to The Great Gatsby",
+    "What books are like 1984?",
+    "Suggest books like Dune",
+    "Recommend books similar to The Hobbit"
+  ]
+}
+
+
+
